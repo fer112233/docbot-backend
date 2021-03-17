@@ -1,5 +1,6 @@
 const express = require('express')
-const path = require('path')
+const bodyParser = require('body-parser')
+const cors = require('cors')
 const PORT = process.env.PORT || 5000
 
 const { Pool } = require('pg');
@@ -10,23 +11,44 @@ const pool = new Pool({
     }
 });
 
-express()
-  .use(express.static(path.join(__dirname, 'public')))
-  .set('views', path.join(__dirname, 'views'))
-  .set('view engine', 'ejs')
-  .get('/', function (req, res) {
-      res.send('ON');
-  })
-    .get('/db', async (req, res) => {
-        try {
-            const client = await pool.connect();
-            const result = await client.query('SELECT * FROM records');
-            const results = { 'results': (result) ? result.rows : null};
-            res.render('pages/db', results );
-            client.release();
-        } catch (err) {
-            console.error(err);
-            res.send("Error " + err);
+const app = express()
+
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({extended: true}))
+app.use(cors())
+
+const getRecords = (request, response) => {
+    pool.query('SELECT * FROM records', (error, results) => {
+        if (error) {
+            throw error
         }
+        response.status(200).json(results.rows)
     })
-  .listen(PORT, () => console.log(`Listening on ${ PORT }`))
+}
+
+const addRecord = (request, response) => {
+    const {id, timeOfMeasure, glucoseValue} = request.body
+
+    pool.query(
+        'INSERT INTO records (id, timeofmeasure, glucosevalue) VALUES ($1, $2, $3)',
+        [id, timeOfMeasure, glucoseValue],
+        (error) => {
+            if (error) {
+                throw error
+            }
+            response.status(201).json({status: 'success', message: 'Record added.'})
+        },
+    )
+}
+
+app
+    .route('/records')
+    // GET endpoint
+    .get(getRecords)
+    // POST endpoint
+    .post(addRecord)
+
+// Start server
+app.listen(PORT, () => {
+    console.log(`Server listening`)
+})
