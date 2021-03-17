@@ -31,7 +31,7 @@ const addRecord = (request, response) => {
     console.log(request.body)
     pool.query(
         'INSERT INTO records (id, timeofmeasure, glucosevalue) VALUES ($1, $2, $3)',
-        [id, timeOfMeasure, glucoseValue],
+        [id, timeOfMeasure, Math.round(100000*glucoseValue)],
         (error) => {
             if (error) {
                 throw error
