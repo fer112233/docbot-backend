@@ -29,6 +29,7 @@ const getRecords = (request, response) => {
 const addRecord = (request, response) => {
     const {id, timeOfMeasure, glucoseValue} = request.body
     console.log(request.body)
+    console.log(id)
     pool.query(
         'INSERT INTO records (id, timeofmeasure, glucosevalue) VALUES ($1, $2, $3)',
         [id, timeOfMeasure, glucoseValue],
