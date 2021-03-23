@@ -56,7 +56,7 @@ app
     .get(getRecords)
     // POST endpoint
     .post(addRecord)
-
+app
     .route('/glucoseLastRecord')
     .get(getGlucoseLastRecord)
 
