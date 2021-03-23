@@ -50,6 +50,30 @@ const addRecord = (request, response) => {
     )
 }
 
+const getGlucoseLastRecord = (request, response) => {
+    pool.query('SELECT * FROM pulsioximeterRecords ORDER BY timeofmeasurelower DESC LIMIT 1', (error, results) => {
+        if (error) {
+            throw error
+        }
+        response.status(200).json(results.rows[0])
+    })
+}
+
+const addRecord = (request, response) => {
+    const {timeOfMeasureLower, timeOfMeasureTop, O2Value, BPMValue} = request.body
+    console.log(request.body)
+    pool.query(
+        'INSERT INTO pulsioximeterRecords (timeofmeasurelower, timeofmeasuretop, o2value, bpmvalue) VALUES ($1, $2, $3, $4)',
+        [timeOfMeasureLower, timeOfMeasureTop, O2Value, BPMValue],
+        (error) => {
+            if (error) {
+                throw error
+            }
+            response.status(201).json({status: 'success', message: 'Record added.'})
+        },
+    )
+}
+
 app
     .route('/records')
     // GET endpoint
