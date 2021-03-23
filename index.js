@@ -26,6 +26,15 @@ const getRecords = (request, response) => {
     })
 }
 
+const getGlucoseLastRecord = (request, response) => {
+    pool.query('SELECT * FROM records ORDER BY timeOfMeasure DESC LIMIT 1', (error, results) => {
+        if (error) {
+            throw error
+        }
+        response.status(200).json(results.rows[0])
+    })
+}
+
 const addRecord = (request, response) => {
     const {id, timeOfMeasure, glucoseValue} = request.body
     console.log(request.body)
@@ -47,6 +56,9 @@ app
     .get(getRecords)
     // POST endpoint
     .post(addRecord)
+
+    .route('/glucoseLastRecord')
+    .get(getGlucoseLastRecord)
 
 // Start server
 app.listen(PORT, () => {
