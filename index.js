@@ -50,7 +50,7 @@ const addRecord = (request, response) => {
     )
 }
 
-const getGlucoseLastRecord = (request, response) => {
+const getPulseOximeterLastRecord = (request, response) => {
     pool.query('SELECT * FROM pulsioximeterRecords ORDER BY timeofmeasurelower DESC LIMIT 1', (error, results) => {
         if (error) {
             throw error
@@ -59,7 +59,7 @@ const getGlucoseLastRecord = (request, response) => {
     })
 }
 
-const addRecord = (request, response) => {
+const addPulseOximeterRecord = (request, response) => {
     const {timeOfMeasureLower, timeOfMeasureTop, O2Value, BPMValue} = request.body
     console.log(request.body)
     pool.query(
@@ -83,6 +83,10 @@ app
 app
     .route('/glucoseLastRecord')
     .get(getGlucoseLastRecord)
+app
+    .route('/pulseOximeterRecord')
+    .get(getPulseOximeterLastRecord)
+    .post(addPulseOximeterRecord)
 
 // Start server
 app.listen(PORT, () => {
